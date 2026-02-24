@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danilarious Screensaver</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+
+<body class="bg-pure-black">
+
+  <script>
+    let config = {
+      speed: 1.0,
+      population: 17,
+      background_effect: "pure-black",
+      scale: 1.0
+    };
+
+    const activeElements = [];
+
+    // 1. Fetch config first
+    fetch('config.json')
+      .then(response => {
+        if (!response.ok) throw new Error("Config not found, using defaults");
+        return response.json();
+      })
+      .catch(err => {
+        console.warn(err);
+        return config; // gracefully degrade
+      })
+      .then(loadedConfig => {
+        config = { ...config, ...loadedConfig };
+        initScreensaver();
+      });
+
+    function initScreensaver() {
+      // Check if we are in preview mode
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('preview') === '1') {
+        document.body.addEventListener('mousemove', () => {
+          window.close(); // Close the preview window on mouse movement
+        }, { once: true });
+      }
+
+      // Apply background effect class
+      document.body.className = `bg-${config.background_effect}`;
+
+      // Pick from the user's customized character list.
+      // If the list is completely empty or missing for some reason, provide a fallback.
+      let availableChars = config.enabled_characters;
+      if (!availableChars || availableChars.length === 0) {
+        console.warn("No characters enabled in config. Falling back to default.");
+        availableChars = ['anti-plunger-snout.svg'];
+      }
+
+      // Shuffle characters to get a random subset
+      const shuffled = availableChars.sort(() => 0.5 - Math.random());
+
+      // Instead of clamping, we create an array of length `config.population`
+      // and loop through our chosen files indefinitely using modulus
+      const charactersToLoad = [];
+      for (let i = 0; i < config.population; i++) {
+        charactersToLoad.push(shuffled[i % shuffled.length]);
+      }
+
+      const baseSize = 250 * config.scale;
+
+      // Use a promised-based approach to load the SVG XML uniquely per file type
+      // to avoid fetching the same SVG 50 times across the network
+      const svgCache = {};
+
+      charactersToLoad.forEach((file, index) => {
+
+        const fetchPromise = svgCache[file] ? Promise.resolve(svgCache[file]) :
+          fetch(`assets/${file}`).then(r => {
+            if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
+            return r.text();
+          }).then(t => { svgCache[file] = t; return t; });
+
+        fetchPromise.then(svgData => {
+
+          const wrapper = document.createElement('div');
+
+          // Randomly apply a CSS animation wrapper class
+          const animationTypes = ['wobble', 'stretch', 'bounce', 'wiggle'];
+          const randomAnim = animationTypes[Math.floor(Math.random() * animationTypes.length)];
+          wrapper.className = `character-container anim-${randomAnim}`;
+
+          // Apply randomness multiplier to the scale for variance
+          // (config.randomness is 0 to 1, modifying scale by +/-)
+          const randomFactor = (Math.random() - 0.5) * 2 * (config.randomness || 0.5); // -1 to 1 * randomness
+          const instanceSize = baseSize * (1 + randomFactor);
+          wrapper.style.width = `${instanceSize}px`;
+
+          // Randomly apply hue rotation for different colored clones based on randomness
+          const hueShift = Math.floor(Math.random() * 360 * (config.randomness || 0.5));
+          if (hueShift > 10) { // Apply noticeable shifts
+            wrapper.style.filter += ` hue-rotate(${hueShift}deg)`;
+          }
+
+          // Clean conflicting SVG styles by namespacing Adobe Illustrator's generated classes and IDs
+          let safeSvg = svgData;
+          const namespace = `${file.replace('.svg', '').replace(/[^a-zA-Z0-9]/g, '_')}_${index}`;
+          safeSvg = safeSvg.replace(/\.cls-/g, `.cls-${namespace}-`);
+          safeSvg = safeSvg.replace(/class="cls-/g, `class="cls-${namespace}-`);
+          safeSvg = safeSvg.replace(/\.st/g, `.st-${namespace}-`);
+          safeSvg = safeSvg.replace(/class="st/g, `class="st-${namespace}-`);
+          safeSvg = safeSvg.replace(/id="SVGID_/g, `id="SVGID_${namespace}_`);
+          safeSvg = safeSvg.replace(/url\(#SVGID_/g, `url(#SVGID_${namespace}_`);
+
+          wrapper.innerHTML = safeSvg;
+
+          // Apply random flip
+          if (Math.random() > 0.5) {
+            const internalSvg = wrapper.querySelector('svg');
+            if (internalSvg) internalSvg.style.transform = 'scaleX(-1)';
+          }
+
+          // Random starting position ensuring it stays within bounds
+          let x = Math.random() * Math.max(0, window.innerWidth - instanceSize);
+          let y = Math.random() * Math.max(0, window.innerHeight - instanceSize);
+
+          // Apply randomness multiplier to velocity variance
+          const speedVariance = 1 + ((Math.random() - 0.5) * (config.randomness || 0.5));
+
+          // Random speed and direction, multiplied by config
+          let baseDx = (Math.random() - 0.5) * 6;
+          let baseDy = (Math.random() - 0.5) * 6;
+          // Ensure it doesn't get stuck with 0 velocity
+          if (Math.abs(baseDx) < 1) baseDx = baseDx < 0 ? -1 : 1;
+          if (Math.abs(baseDy) < 1) baseDy = baseDy < 0 ? -1 : 1;
+
+          let dx = baseDx * config.speed * speedVariance;
+          let dy = baseDy * config.speed * speedVariance;
+
+          document.body.appendChild(wrapper);
+
+          // Force reflow/render of SVG to populate inner heights accurately 
+          // Use getBoundingClientRect so CSS scale factors are fully digested
+          requestAnimationFrame(() => {
+            const rect = wrapper.getBoundingClientRect();
+            activeElements.push({
+              element: wrapper,
+              x,
+              y,
+              dx,
+              dy,
+              width: rect.width || instanceSize,
+              height: rect.height || instanceSize // fallback
+            });
+          });
+        })
+          .catch(err => console.error('Error loading SVG:', file, err));
+      });
+
+      // Background Cycling Engine
+      if (config.background_effect === 'random' && config.bg_cycle_seconds > 0) {
+        const bgPool = ["stars", "gradient", "rainbow-pulse", "hyperspace", "neon-grid", "pure-black"];
+        let currentBg = bgPool[Math.floor(Math.random() * bgPool.length)];
+        document.body.className = `bg-${currentBg}`;
+
+        setInterval(() => {
+          let nextBg = bgPool[Math.floor(Math.random() * bgPool.length)];
+          // Ensure it actually changes
+          while (nextBg === currentBg) nextBg = bgPool[Math.floor(Math.random() * bgPool.length)];
+          currentBg = nextBg;
+          document.body.className = `bg-${currentBg}`;
+        }, config.bg_cycle_seconds * 1000);
+      } else {
+        document.body.className = `bg-${config.background_effect}`;
+      }
+
+      // Lens Effect: Kaleidoscope setup (HTML manipulation, CSS does the rest)
+      if (config.lens_effect === 'kaleidoscope') {
+        // Wrap everything in a primary container so we can duplicate it symmetrically
+        document.body.classList.add('lens-kaleidoscope');
+        const canvas = document.createElement('div');
+        canvas.id = "kaleidoscope-canvas";
+
+        // Move all body children (except the script tag itself) into the new canvas layer
+        Array.from(document.body.children).forEach(child => {
+          if (child.tagName !== 'SCRIPT') canvas.appendChild(child);
+        });
+
+        // Create the 4 mirrored quadrants
+        for (let i = 0; i < 4; i++) {
+          let quad = canvas.cloneNode(true);
+          quad.className = `quadrant quad-${i}`;
+          if (i === 0) document.body.appendChild(quad); // Q1 Top Left (Normal)
+          if (i === 1) document.body.appendChild(quad); // Q2 Top Right (Flipped X)
+          if (i === 2) document.body.appendChild(quad); // Q3 Bottom Left (Flipped Y)
+          if (i === 3) document.body.appendChild(quad); // Q4 Bottom Right (Flipped X & Y)
+        }
+      }
+
+      // Lens Effect: Trails Timer
+      if (config.lens_effect === 'trails') {
+        setInterval(() => {
+          activeElements.forEach(item => {
+            // Don't trail every frame, trail periodically for visual separation
+            const ghost = item.element.cloneNode(true);
+            // Stripping ID and micro animations to reduce CPU load on clones
+            ghost.className = 'character-container trail-ghost';
+            ghost.style.transform = `translate(${item.x}px, ${item.y}px)`;
+
+            // Add to body, then quickly remove after fade
+            document.body.appendChild(ghost);
+            setTimeout(() => { if (ghost.parentNode) ghost.parentNode.removeChild(ghost); }, 1000);
+          });
+        }, 80); // Spawn a ghost every 80ms
+      }
+
+      animate();
+    }
+
+    let frameCount = 0;
+    // The Physics Engine (Bouncing off edges)
+    function animate() {
+      // Configuration Churning Engine (Drifts speed/scale gradually over time using sine waves)
+      let dynamicsMultiplier = 1.0;
+      if (config.cycle_settings) {
+        frameCount++;
+        // Generates a smooth sine wave oscillating between 0.5 and 1.5 roughly every 5 seconds
+        dynamicsMultiplier = 1.0 + (Math.sin(frameCount * 0.02) * 0.5);
+      }
+
+      activeElements.forEach(item => {
+        // Apply organic speed drifting
+        item.x += (item.dx * dynamicsMultiplier);
+        item.y += (item.dy * dynamicsMultiplier);
+
+        // Since CSS animations like 'stretch' might dynamically modify the height/width,
+        // we pull the physically painted bounds on every frame to fix the bottom boundary cut-off bug.
+        const rect = item.element.getBoundingClientRect();
+
+        // Update boundaries checking using TRUE dynamic dimensions
+        if (item.x <= 0) {
+          item.x = 0;
+          item.dx *= -1;
+        } else if (item.x + rect.width >= window.innerWidth) {
+          item.x = window.innerWidth - rect.width;
+          item.dx *= -1;
+        }
+
+        if (item.y <= 0) {
+          item.y = 0;
+          item.dy *= -1;
+        } else if (item.y + rect.height >= window.innerHeight) {
+          // Add a tiny buffer (2px) just to stop jittering on the exact bottom edge 
+          // when stretch animations fire.
+          item.y = window.innerHeight - rect.height - 2;
+          item.dy *= -1;
+        }
+
+        // Apply organic scaler drifting via CSS Transform
+        item.element.style.transform = `translate(${item.x}px, ${item.y}px) scale(${dynamicsMultiplier})`;
+      });
+
+      requestAnimationFrame(animate);
+    }
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,197 @@
+/* Base structure for the screensaver void */
+body {
+  background-color: #000;
+  margin: 0;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  transition: background-color 1s ease-in-out;
+}
+
+/* Background Animations */
+@keyframes stars-move {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: -200px 200px;
+  }
+}
+
+@keyframes sparkle {
+
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+body.bg-stars {
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1.5px 1.5px at 40px 70px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 50px 160px, #d3d3d3, rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(2.5px 2.5px at 130px 80px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1.5px 1.5px at 160px 120px, #d3d3d3, rgba(0, 0, 0, 0));
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  animation: stars-move 100s linear infinite, sparkle 4s ease-in-out infinite;
+}
+
+@keyframes hyperspace-zoom {
+  0% {
+    transform: scale(1);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+body.bg-hyperspace {
+  background-color: #050510;
+  position: relative;
+}
+
+body.bg-hyperspace::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, #fff, rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 60% 70%, #fff, rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 80% 20%, #fff, rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 40% 90%, #fff, rgba(0, 0, 0, 0));
+  background-size: 150px 150px;
+  animation: hyperspace-zoom 2s linear infinite;
+  z-index: -1;
+}
+
+@keyframes grid-move {
+  0% {
+    transform: perspective(300px) rotateX(60deg) translateY(0);
+  }
+
+  100% {
+    transform: perspective(300px) rotateX(60deg) translateY(50px);
+  }
+}
+
+body.bg-neon-grid {
+  background-color: #020005;
+  position: relative;
+  overflow: hidden;
+}
+
+body.bg-neon-grid::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  right: -50%;
+  bottom: -50%;
+  background-image:
+    linear-gradient(transparent 48px, rgba(255, 0, 255, 0.4) 50px),
+    linear-gradient(90deg, transparent 48px, rgba(0, 255, 255, 0.4) 50px);
+  background-size: 50px 50px;
+  animation: grid-move 1.5s linear infinite;
+  z-index: -1;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* New Phase 5 Background: Rainbow Pulse */
+@keyframes rainbow-pulse-anim {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+body.bg-rainbow-pulse {
+  background: radial-gradient(circle at center, #ff0055, #4400ff, #00eeff);
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite, rainbow-pulse-anim 10s linear infinite;
+}
+
+/* Phase 5 Lenses: Kaleidoscope Mapping */
+body.lens-kaleidoscope {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100vw;
+  height: 100vh;
+}
+
+#kaleidoscope-canvas {
+  display: none;
+  /* Hide the raw staging area */
+}
+
+.quadrant {
+  width: 50vw;
+  height: 50vh;
+  position: relative;
+  overflow: hidden;
+  background-color: transparent;
+  /* inherit body bg */
+}
+
+/* Q1 Top Left */
+.quad-0 {
+  transform: scale(1, 1);
+}
+
+/* Q2 Top Right */
+.quad-1 {
+  transform: scale(-1, 1);
+}
+
+/* Q3 Bottom Left */
+.quad-2 {
+  transform: scale(1, -1);
+}
+
+/* Q4 Bottom Right */
+.quad-3 {
+  transform: scale(-1, -1);
+}
+
+/* Phase 5 Lenses: Ghost Trails */
+.trail-ghost {
+  opacity: 0.4;
+  pointer-events: none;
+  transition: opacity 1s ease-out;
+  animation: none !important;
+  /* Disable wobbles on ghost */
+  z-index: -1;
+}

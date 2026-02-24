@@ -1,0 +1,182 @@
+/* Example animation for "spines" ID used inside SVGs */
+@keyframes undulate {
+    0% {
+        transform: scaleY(1);
+    }
+
+    50% {
+        transform: scaleY(1.1) translateY(-2px);
+    }
+
+    100% {
+        transform: scaleY(1);
+    }
+}
+
+#spines {
+    transform-origin: bottom center;
+    animation: undulate 2s ease-in-out infinite;
+}
+
+/* Example animation for "bat-arm" ID used inside SVGs */
+@keyframes wave {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(15deg);
+    }
+
+    75% {
+        transform: rotate(-10deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+#bat-arm {
+    transform-origin: bottom center;
+    animation: wave 1.5s ease-in-out infinite;
+}
+
+/* Example animation for eyes */
+@keyframes dart {
+
+    0%,
+    10% {
+        transform: translateX(0);
+    }
+
+    15%,
+    30% {
+        transform: translateX(-3px);
+    }
+
+    35%,
+    60% {
+        transform: translateX(4px);
+    }
+
+    65%,
+    90% {
+        transform: translateX(-2px);
+    }
+
+    95%,
+    100% {
+        transform: translateX(0);
+    }
+}
+
+#eyes,
+.eye {
+    animation: dart 3s steps(1) infinite;
+}
+
+/* Example gentle hover/float effect applicable to whole SVG roots if needed */
+@keyframes float {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-5px) rotate(1deg);
+    }
+
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+}
+
+.character-container>svg {
+    /* You can enable this base float on all SVGs to add life independent of CSS micro-animations */
+    animation: float 4s ease-in-out infinite;
+}
+
+/* =========================================
+   Container Physics Animations 
+   (Randomly applied by index.html JS engine)
+   ========================================= */
+
+@keyframes wobble {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(-5deg);
+    }
+
+    50% {
+        transform: rotate(0deg);
+    }
+
+    75% {
+        transform: rotate(5deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+.anim-wobble svg {
+    animation: wobble 2.5s ease-in-out infinite !important;
+}
+
+@keyframes stretch {
+    0% {
+        transform: scale(1, 1);
+    }
+
+    50% {
+        transform: scale(1.08, 0.92);
+    }
+
+    100% {
+        transform: scale(1, 1);
+    }
+}
+
+.anim-stretch svg {
+    animation: stretch 1.8s ease-in-out infinite !important;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+.anim-bounce svg {
+    animation: bounce 1.2s cubic-bezier(0.28, 0.84, 0.42, 1) infinite !important;
+}
+
+@keyframes wiggle {
+
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(-8deg) translateY(-2px);
+    }
+
+    75% {
+        transform: rotate(8deg) translateY(-2px);
+    }
+}
+
+.anim-wiggle svg {
+    animation: wiggle 0.8s ease-in-out infinite !important;
+}
