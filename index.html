@@ -96,9 +96,11 @@
           wrapper.style.width = `${instanceSize}px`;
 
           // Randomly apply hue rotation for different colored clones based on randomness
-          const hueShift = Math.floor(Math.random() * 360 * (config.randomness || 0.5));
-          if (hueShift > 10) { // Apply noticeable shifts
-            wrapper.style.filter += ` hue-rotate(${hueShift}deg)`;
+          if (config.randomize_colors !== false) {
+            const hueShift = Math.floor(Math.random() * 360 * (config.randomness || 0.5));
+            if (hueShift > 10) { // Apply noticeable shifts
+              wrapper.style.filter += ` hue-rotate(${hueShift}deg)`;
+            }
           }
 
           // Clean conflicting SVG styles by namespacing Adobe Illustrator's generated classes and IDs

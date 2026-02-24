@@ -16,6 +16,7 @@ DEFAULT_CONFIG = {
     "background_effect": "pure-black",
     "scale": 1.0,
     "randomness": 0.5,
+    "randomize_colors": True,
     "cycle_settings": False,
     "bg_cycle_seconds": 10,
     "lens_effect": "none",
@@ -48,6 +49,7 @@ class ScreensaverSettings(tk.Tk):
         self.population_var = tk.IntVar()
         self.scale_var = tk.DoubleVar()
         self.rand_var = tk.DoubleVar()
+        self.randomize_colors_var = tk.BooleanVar()
         self.bg_var = tk.StringVar()
         self.cycle_settings_var = tk.BooleanVar()
         self.bg_cycle_sec_var = tk.IntVar()
@@ -90,6 +92,7 @@ class ScreensaverSettings(tk.Tk):
                 'population': int(self.population_var.get()),
                 'scale': float(self.scale_var.get()),
                 'randomness': float(self.rand_var.get()),
+                'randomize_colors': bool(self.randomize_colors_var.get()),
                 'background_effect': str(self.bg_var.get()),
                 'cycle_settings': bool(self.cycle_settings_var.get()),
                 'bg_cycle_seconds': int(self.bg_cycle_sec_var.get()),
@@ -201,6 +204,12 @@ class ScreensaverSettings(tk.Tk):
         self.rand_var.trace_add("write", update_rand_display)
         update_rand_display()
         ttk.Label(rand_frame, textvariable=rand_display, width=5).pack(side=tk.RIGHT)
+
+        # Randomize Colors Checkbox
+        colors_frame = ttk.Frame(parent_frame)
+        colors_frame.pack(fill=tk.X, pady=5)
+        self.randomize_colors_var = tk.BooleanVar(value=bool(self.config_data.get('randomize_colors', True)))
+        ttk.Checkbutton(colors_frame, text="Randomize Colors (Hue Rotation)", variable=self.randomize_colors_var).pack(side=tk.LEFT)
 
         # Cycle Settings Checkbox
         cycle_frame = ttk.Frame(parent_frame)

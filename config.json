@@ -1,7 +1,29 @@
 {
-  "speed": 4.014201183431953,
-  "population": 78,
-  "background_effect": "gradient",
-  "scale": 0.1,
-  "randomness": 0.6
+  "speed": 3.441935483870968,
+  "population": 36,
+  "background_effect": "rainbow-pulse",
+  "scale": 0.6799999999999999,
+  "randomness": 0.0,
+  "randomize_colors": true,
+  "enabled_characters": [
+    "bb-hinge-jaw.svg",
+    "bullet.svg",
+    "spring-tung.svg",
+    "green-beret.svg",
+    "anti-plunger-snout.svg",
+    "green-snek.svg",
+    "wiggly-tooth.svg",
+    "twohed.svg",
+    "dichotomous-beak.svg",
+    "plunger-snout.svg",
+    "guitar-dan.svg",
+    "blue-pin.svg",
+    "guitar-anti-dan.svg",
+    "yellow-toof-green-fish.svg",
+    "otis.svg",
+    "green-body-yellow-bat.svg"
+  ],
+  "cycle_settings": true,
+  "bg_cycle_seconds": 10,
+  "lens_effect": "none"
 }
