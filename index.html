@@ -89,15 +89,18 @@
           const randomAnim = animationTypes[Math.floor(Math.random() * animationTypes.length)];
           wrapper.className = `character-container anim-${randomAnim}`;
 
+          // Extract randomness safely: if slider is 0, allow 0. Otherwise fallback to 0.5 default if config is broken
+          const rawRandomness = config.randomness !== undefined ? config.randomness : 0.5;
+
           // Apply randomness multiplier to the scale for variance
           // (config.randomness is 0 to 1, modifying scale by +/-)
-          const randomFactor = (Math.random() - 0.5) * 2 * (config.randomness || 0.5); // -1 to 1 * randomness
+          const randomFactor = (Math.random() - 0.5) * 2 * rawRandomness; // -1 to 1 * randomness
           const instanceSize = baseSize * (1 + randomFactor);
           wrapper.style.width = `${instanceSize}px`;
 
           // Randomly apply hue rotation for different colored clones based on randomness
           if (config.randomize_colors !== false) {
-            const hueShift = Math.floor(Math.random() * 360 * (config.randomness || 0.5));
+            const hueShift = Math.floor(Math.random() * 360 * rawRandomness);
             if (hueShift > 10) { // Apply noticeable shifts
               wrapper.style.filter += ` hue-rotate(${hueShift}deg)`;
             }
@@ -126,7 +129,7 @@
           let y = Math.random() * Math.max(0, window.innerHeight - instanceSize);
 
           // Apply randomness multiplier to velocity variance
-          const speedVariance = 1 + ((Math.random() - 0.5) * (config.randomness || 0.5));
+          const speedVariance = 1 + ((Math.random() - 0.5) * rawRandomness);
 
           // Random speed and direction, multiplied by config
           let baseDx = (Math.random() - 0.5) * 6;
