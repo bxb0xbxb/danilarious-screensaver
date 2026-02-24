@@ -139,9 +139,21 @@ body.bg-neon-grid::before {
 }
 
 body.bg-rainbow-pulse {
+  background-color: #000;
+  position: relative;
+}
+
+body.bg-rainbow-pulse::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: radial-gradient(circle at center, #ff0055, #4400ff, #00eeff);
   background-size: 200% 200%;
   animation: gradient-shift 3s ease infinite, rainbow-pulse-anim 10s linear infinite;
+  z-index: -2;
 }
 
 /* Character Container Physics */

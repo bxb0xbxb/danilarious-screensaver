@@ -31,6 +31,13 @@ class ScreensaverSettings(tk.Tk):
         self.geometry("450x550")
         self.resizable(False, False)
 
+        try:
+            # Set the X11 Window Icon for the Dock/Taskbar
+            icon = tk.PhotoImage(file=os.path.join(ASSETS_DIR, 'otis.png'))
+            self.iconphoto(True, icon)
+        except Exception as e:
+            print(f"Warning: Could not load application icon: {e}")
+
         self.config_data: dict[str, float | int | str | bool | list] = self.load_config()
         
         # Discover available assets
