@@ -144,6 +144,16 @@ body.bg-rainbow-pulse {
   animation: gradient-shift 3s ease infinite, rainbow-pulse-anim 10s linear infinite;
 }
 
+/* Character Container Physics */
+.character-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: center center;
+  /* Allow clicking through the characters to interaction with the background if needed */
+  pointer-events: none;
+}
+
 /* Phase 5 Lenses: Kaleidoscope Mapping */
 body.lens-kaleidoscope {
   display: flex;
